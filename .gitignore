@@ -80,4 +80,5 @@ user_song_list.h
 
 # ignore everything but my keyboard
 keyboards/*
-!keyboards/macropad/
+!keyboards/macropad
+!keyboards/1upkeyboards
