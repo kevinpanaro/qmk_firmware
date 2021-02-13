@@ -213,6 +213,9 @@ void oled_task_user(void) {
 	 case _COD:
 	     oled_write_P(PSTR("call of duty\n"), false);
 	     break;
+	 case _SPOTIFY:
+	     oled_write_P(PSTR("spotify\n"), false);
+	     break;
 	 default:
 	     oled_write_P(PSTR("undefined"), false);
 	     break;

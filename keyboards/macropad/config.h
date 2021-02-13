@@ -163,3 +163,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Combo  setup
 #define COMBO_COUNT 1 
+
+// for debugging, do not keep in production
+//#define DEBUG_MATRIX_SCAN_RATE
