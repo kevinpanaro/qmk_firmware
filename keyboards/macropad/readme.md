@@ -4,7 +4,7 @@
 
 *A short description of the keyboard/project*
 
-* Keyboard Maintainer: [Kevin Panaro](https://github.com/yourusername)
+* Keyboard Maintainer: [Kevin Panaro](https://github.com/kevinpanaro)
 * Hardware Supported: *The PCBs, controllers supported*
 * Hardware Availability: *Links to where you can find this hardware*
 

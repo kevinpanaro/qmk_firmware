@@ -27,7 +27,7 @@ enum layer_names {
     _DISCORD=1,
     _VALORANT=2,
     _NUMPAD=3,
-    _HASS=4, 
+    _HASS=4,
     _COD=5,
     _SPOTIFY=6,
 };
@@ -66,43 +66,43 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO,
         KC_A    ,   KC_B    ,    KC_C   ,
         KC_D    ,   KC_E    ,    KC_F   ,
-        KC_G    ,   KC_H    ,    KC_I    
+        KC_G    ,   KC_H    ,    KC_I
     ),
     [_DISCORD] = LAYOUT(
-        MOVE_HOME, 
-	MEH(KC_F1),   KC_T    ,    KC_U   ,
-	KC_V    ,   KC_W    ,    KC_X   ,
-	KC_Y    ,   KC_Z    ,    KC_R
+        MOVE_HOME,
+	      MEH(KC_F1),   KC_T    ,    KC_U   ,
+        KC_V    ,   KC_W    ,    KC_X   ,
+	      KC_Y    ,   KC_Z    ,    KC_R
     ),
     [_VALORANT] = LAYOUT(
-        MOVE_HOME, 
-	MEH(KC_F1),   KC_T    ,    KC_U   ,
-	KC_V    ,   KC_W    ,    VAL_COMMEND  ,
-	VAL_ULT ,  VAL_NO   ,    VAL_YES
+        MOVE_HOME,
+        MEH(KC_F1),   KC_T    ,    KC_U   ,
+        KC_V    ,   KC_W    ,    VAL_COMMEND  ,
+        VAL_ULT ,  VAL_NO   ,    VAL_YES
     ),
     [_NUMPAD] = LAYOUT(
-	MOVE_HOME,
-	KC_7    ,   KC_8    ,    KC_9   ,
-	KC_4    ,   KC_5    ,    KC_6   ,
-	TD_1_0    ,   KC_2    ,    KC_3   
+        MOVE_HOME,
+        KC_7    ,   KC_8    ,    KC_9   ,
+        KC_4    ,   KC_5    ,    KC_6   ,
+        TD_1_0    ,   KC_2    ,    KC_3
     ),
     [_HASS] = LAYOUT(
-	MOVE_HOME,
-	KC_NO   ,   KC_NO   ,    KC_NO  ,
-	KC_NO   ,   KC_NO   ,    KC_NO  ,
-	KC_F19  ,   KC_NO   ,    KC_NO   
+        MOVE_HOME,
+        KC_NO   ,   KC_NO   ,    KC_NO  ,
+        KC_NO   ,   KC_NO   ,    KC_NO  ,
+        KC_F19  ,   KC_NO   ,    KC_NO
     ),
     [_COD] = LAYOUT(
-	MOVE_HOME,
-	MEH(KC_F1),   KC_F8   ,    KC_F7  ,
-	KC_NO   ,   KC_NO   ,    KC_NO  ,
-	KC_NO   ,   KC_NO   ,    KC_F10   
+        MOVE_HOME,
+        MEH(KC_F1),   KC_F8   ,    KC_F7  ,
+        KC_NO   ,   KC_NO   ,    KC_NO  ,
+        KC_NO   ,   KC_NO   ,    KC_F10
     ),
     [_SPOTIFY] = LAYOUT(
-	MOVE_HOME,
-	A(KC_F20), KC_F20, C(KC_F20),
-	SFT_T(KC_NO), KC_NO, KC_NO,
-	KC_NO, KC_NO, KC_NO
+        MOVE_HOME,
+	      A(KC_F20),    KC_F20, C(KC_F20),
+        SFT_T(KC_NO), KC_NO ,  KC_NO,
+        KC_NO    ,    KC_NO ,  KC_NO
     )
 };
 
@@ -113,87 +113,85 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 
 void process_combo_event(uint16_t combo_index, bool pressed) {
     switch(combo_index) {
-	case COMBO_RESET:
-	     if (pressed) {
-		 tap_code16(RESET);
-	     }
-	     break;
-	}
+        case COMBO_RESET:
+            if (pressed) {
+		            tap_code16(RESET);
+	          }
+	          break;
+	  }
 }
 
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     switch (keycode) {
-	case MOVE_HOME:
-	    if (record->event.pressed) {
-		layer_move(0);
-	    } else {
-	    }
-	    return false;
-	case VAL_YES:
-	    if (record->event.pressed) {
-	        SEND_STRING(".33");
-	    } else {
-	    }
-	    return false;
-	case VAL_NO:
-	    if (record->event.pressed) {
-	        SEND_STRING(".34");
-	    } else {
-	    }
-	    return false;
-	case VAL_ULT:
-	    if (record->event.pressed) {
-	        SEND_STRING(".15");
-	    } else {
-	    }
-	    return false;
-	case VAL_COMMEND:
-	    if (record->event.pressed) {
-	        SEND_STRING(".32");
-	    } else {
-	    }
-	    return false;
-	default:
-	    return true;
+	      case MOVE_HOME:
+	          if (record->event.pressed) {
+		            layer_move(0);
+	          } else {
+	          }
+	          return false;
+        case VAL_YES:
+	          if (record->event.pressed) {
+	              SEND_STRING(".33");
+	          } else {
+	          }
+	          return false;
+	      case VAL_NO:
+	          if (record->event.pressed) {
+	              SEND_STRING(".34");
+	          } else {
+	          }
+	          return false;
+	      case VAL_ULT:
+	          if (record->event.pressed) {
+	              SEND_STRING(".15");
+	          } else {
+	          }
+	          return false;
+	      case VAL_COMMEND:
+	          if (record->event.pressed) {
+	              SEND_STRING(".32");
+	          } else {
+	          }
+	          return false;
+	      default:
+	          return true;
     }
 }
 
 void next_layer(void) {
     uint8_t layer = get_highest_layer(layer_state);
-
     if ( ( layer + 1 ) < num_of_layers ) {
         layer = layer + 1;
     } else {
-	layer = 0;
+        layer = 0;
     }
     layer_move(layer);
 }
 
 void prev_layer(void) {
     uint8_t layer = get_highest_layer(layer_state);
-
     if ( layer == 0 ) {
-	layer = num_of_layers - 1;
+	      layer = num_of_layers - 1;
     } else {
-	layer = layer - 1;
+	      layer = layer - 1;
     }
     layer_move(layer);
 }
 
 void encoder_update_user(uint8_t index, bool clockwise) {
     if ( clockwise ) {
-	next_layer();
+	      next_layer();
     } else {
-	prev_layer();
+	      prev_layer();
     }
 }
 
 #ifdef OLED_DRIVER_ENABLE
 void oled_task_user(void) {
      oled_write_P(PSTR("layer: "), false);
-     
+
      switch (get_highest_layer(layer_state)) {
 	 case _BASE:
 	     oled_write_P(PSTR("default\n"), false);
