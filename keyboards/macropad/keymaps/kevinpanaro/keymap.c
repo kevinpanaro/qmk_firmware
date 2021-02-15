@@ -193,31 +193,34 @@ void oled_task_user(void) {
      oled_write_P(PSTR("layer: "), false);
 
      switch (get_highest_layer(layer_state)) {
-	 case _BASE:
-	     oled_write_P(PSTR("default\n"), false);
-	     break;
-	 case _DISCORD:
-	     oled_write_P(PSTR("discord\n"), false);
-	     break;
-	 case _VALORANT:
-	     oled_write_P(PSTR("valorant\n"), false);
-	     break;
-	 case _NUMPAD:
-	     oled_write_P(PSTR("numpad\n"), false);
-	     break;
-	 case _HASS:
-	     oled_write_P(PSTR("home assistant\n"), false);
-	     break;
-	 case _COD:
-	     oled_write_P(PSTR("call of duty\n"), false);
-	     break;
-	 case _SPOTIFY:
-	     oled_write_P(PSTR("spotify\n"), false);
-	     break;
-	 default:
-	     oled_write_P(PSTR("undefined"), false);
-	     break;
+    	 case _BASE:
+    	     oled_write_P(PSTR("default\n"), false);
+    	     break;
+    	 case _DISCORD:
+    	     oled_write_P(PSTR("discord\n"), false);
+    	     break;
+    	 case _VALORANT:
+    	     oled_write_P(PSTR("valorant\n"), false);
+    	     break;
+    	 case _NUMPAD:
+    	     oled_write_P(PSTR("numpad\n"), false);
+    	     break;
+    	 case _HASS:
+    	     oled_write_P(PSTR("home assistant\n"), false);
+    	     break;
+    	 case _COD:
+    	     oled_write_P(PSTR("call of duty\n"), false);
+    	     break;
+    	 case _SPOTIFY:
+    	     oled_write_P(PSTR("spotify\n"), false);
+    	     break;
+    	 default:
+    	     oled_write_P(PSTR("undefined\n"), false);
+    	     break;
      }
+     // Host Keyboard LED Status
+     led_t led_state = host_keyboard_led_state();
+     oled_write_P(led_state.caps_lock ? PSTR("CAPS ") : PSTR("     "), false);
 }
 #endif
 
