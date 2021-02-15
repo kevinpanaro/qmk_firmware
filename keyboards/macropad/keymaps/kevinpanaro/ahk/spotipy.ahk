@@ -8,17 +8,17 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; change these paths
 
 F20::
-Run, C:\path\to\python.exe "C:\path\to\spot.py" "toggle", , Hide
+Run, C:\path\to\python.exe "C:\path\to\qmk_spot.py" "toggle", , Hide
 return
 
 !F20::
-Run, C:\path\to\python.exe "C:\path\to\spot.py" "up", , Hide
+Run, C:\path\to\python.exe "C:\path\to\qmk_spot.py" "up", , Hide
 return
 
 ^F20::
-Run, C:\path\to\python.exe "C:\path\to\spot.py" "down", , Hide
+Run, C:\path\to\python.exe "C:\path\to\qmk_spot.py" "down", , Hide
 return
 
 +^F20::
-Run, C:\path\to\python.exe "C:\path\to\spot.py" "shuffle", , Hide
+Run, C:\path\to\python.exe "C:\path\to\qmk_spot.py" "shuffle", , Hide
 return
