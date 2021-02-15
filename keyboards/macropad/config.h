@@ -38,11 +38,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * ROWS: AVR pins used for rows, top to bottom
  * DIODE_DIRECTION: COL2ROW = COL = Anode (+), ROW = Cathode (-, marked on diode)
  *                  ROW2COL = ROW = Anode (+), COL = Cathode (-, marked on diode)
- *
+ * UNUSED_PINS: pins that are not used, for reference
  */
 #define MATRIX_ROW_PINS { D4, B5, C7, F0 }
 #define MATRIX_COL_PINS { C6, B4, F1, B6 }
-#define UNUSED_PINS
+#define UNUSED_PINS     { D3, D2, B7, D5, B2, B3, B1, F7, F6, F5, B0 }
 
 /* COL2ROW, ROW2COL */
 #define DIODE_DIRECTION COL2ROW
