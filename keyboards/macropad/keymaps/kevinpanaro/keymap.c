@@ -220,7 +220,7 @@ void oled_task_user(void) {
      }
      // Host Keyboard LED Status
      led_t led_state = host_keyboard_led_state();
-     oled_write_P(led_state.caps_lock ? PSTR("CAPS ") : PSTR("     "), false);
+     oled_write_P(led_state.caps_lock ? PSTR("caps ") : PSTR("     "), false);
 }
 #endif
 
