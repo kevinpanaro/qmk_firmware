@@ -1,1 +1,1 @@
-# The default keymap for debug
+# The debug keymap for macropad
