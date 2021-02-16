@@ -78,7 +78,10 @@ __pycache__
 # Allow to exist but don't include it in the repo
 user_song_list.h
 
-# ignore everything but my keyboard
+# ignore everything but my keyboard and other things i don't want tracked.
 keyboards/*
 !keyboards/macropad
-!keyboards/1upkeyboards
+config.ini
+creds.json
+spot.py
+__avr_gdbinit
