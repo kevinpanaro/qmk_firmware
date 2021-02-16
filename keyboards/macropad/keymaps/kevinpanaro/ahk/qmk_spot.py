@@ -5,6 +5,7 @@ import spotipy
 from configparser import ConfigParser
 from spotipy.oauth2 import SpotifyOAuth
 
+
 class QMKSpot():
     def __init__(self, config_path, command):
 
@@ -37,6 +38,10 @@ class QMKSpot():
         for device in self.spotify.devices()['devices']:
             if device['name'] == self.device:
                 self.device_id = device['id']
+                break
+        else:
+            raise Exception("Device {} not found. Try opening the app on a device.".format(self.device))
+
 
         self.state = self.spotify.current_playback()
         # if not self.state:
@@ -91,9 +96,13 @@ class QMKSpot():
 
 def main():
     parser = argparse.ArgumentParser(description="Control Spotify")
-    parser.add_argument('command', action="store", type=str,
-                        choices=["up", "down", "toggle", "shuffle"],
-                        help="command to control spotify")
+    parser.add_argument(
+        'command',
+        action="store",
+        type=str,
+        choices=["up", "down", "toggle", "shuffle"],
+        help="command to control spotify"
+    )
 
     arg = parser.parse_args()
 
