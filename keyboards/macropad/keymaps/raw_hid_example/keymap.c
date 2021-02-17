@@ -42,25 +42,34 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 bool is_hid_connected = false; // is pc connected yet?
 uint8_t screen_max_count = 0;  // number of info screens we can scroll through
 uint8_t screen_show_index = 0; // current index of the info screens
-//uint8_t screen_data_buffer[SERIAL_SCREEN_BUFFER_LENGTH - 1] =  {0}; // buffer for screen data
+uint8_t screen_data_buffer[64 - 1] =  {0}; // buffer for screen data
 int screen_data_index = 0;     // current index into screen data buffer
-
+uint8_t start_line = 0;
+uint8_t end_line = 0;
 
 #ifdef OLED_DRIVER_ENABLE
-void oled_task_user(void) {
-     // Host Keyboard LED Status
-     led_t led_state = host_keyboard_led_state();
-     oled_write_P(led_state.caps_lock ? PSTR("caps ") : PSTR(" "), false);
-}
+// void oled_task_user(void) {
+//     // Host Keyboard LED Status
+//     led_t led_state = host_keyboard_led_state();
+//     oled_write_P(led_state.caps_lock ? PSTR("caps ") : PSTR(" "), false);
+// }
 #endif
 
 #ifdef RAW_ENABLE
 void raw_hid_receive(uint8_t *data, uint8_t length) {
+    //oled_scroll_set_area(start_line, end_line);
     // if we are here, the pc is connected
     is_hid_connected = true;
+    const char *oled_data = (char*)data;
 
-
-
-    raw_hid_send(data, length);
+    switch( data[0] ) {
+        case 8:
+            oled_clear();
+            break;
+        default:
+            oled_set_cursor(0, data[0]);
+            oled_write(oled_data + 1, false);
+        }
+    //raw_hid_send(data, length);
 }
 #endif
