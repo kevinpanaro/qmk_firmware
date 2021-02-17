@@ -63,6 +63,13 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     const char *oled_data = (char*)data;
 
     switch( data[0] ) {
+        case 1:
+            oled_set_cursor(0, data[1]);
+            oled_write(oled_data + 2, false);
+            break;
+        case 2:
+            oled_write_pixel(data[1], data[2], true);
+            break;
         case 8:
             switch( data[1] ) {
                 case 8:
@@ -75,8 +82,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             }
             break;
         default:
-            oled_set_cursor(0, data[0]);
-            oled_write(oled_data + 1, false);
+            break;
         }
     //raw_hid_send(data, length);
 }
