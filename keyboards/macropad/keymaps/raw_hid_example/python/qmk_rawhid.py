@@ -1,7 +1,7 @@
 import hid
 import os
 from configparser import ConfigParser
-
+from time import sleep
 
 
 class QMKDevice():
@@ -34,7 +34,10 @@ class QMKDevice():
         print("Device manufacturer: {}".format(self.device.manufacturer))
         print("Product: {}".format(self.device.product))
 
-    def send(self, data, line):
+    def send(self, data, line, clear=True):
+        self.clear_line(line)
+        if line == 0:
+            data = b' ' + data
         data = self.tobytes([line, data])
         self.device.write(self.pad(data))
 
@@ -59,6 +62,10 @@ class QMKDevice():
     def clear_screen(self):
         self.send(b'', 8)
 
+    def clear_line(self, line):
+        data = self.tobytes([8, line])
+        self.device.write(self.pad(data))
+
 def main():
     abspath = os.path.abspath(__file__)
     dirname = os.path.dirname(abspath)
@@ -67,7 +74,11 @@ def main():
 
     try:
         me = QMKDevice(config_path)
-        me.send(data=b'It works!', line=3)
+        me.clear_screen()
+        me.send(data=b'It works!', line=2)
+
+
+
     finally:
         me.close()
 
