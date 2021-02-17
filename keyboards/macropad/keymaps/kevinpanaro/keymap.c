@@ -197,7 +197,7 @@ void oled_task_user(void) {
     	     oled_write_P(PSTR("default\n"), false);
     	     break;
     	 case _DISCORD:
-    	     oled_write_P(PSTR("discord\n"), false);
+    	     oled_write_P(PSTR("discords"), false);
     	     break;
     	 case _VALORANT:
     	     oled_write_P(PSTR("valorant\n"), false);
@@ -226,6 +226,27 @@ void oled_task_user(void) {
 
 #ifdef RAW_ENABLE
 void raw_hid_receive(uint8_t *data, uint8_t length) {
-    raw_hid_send(data, length);
+    //oled_scroll_set_area(start_line, end_line);
+    // if we are here, the pc is connected
+    //is_hid_connected = true;
+    const char *oled_data = (char*)data;
+
+    switch( data[0] ) {
+        case 8:
+            switch( data[1] ) {
+                case 8:
+                    oled_clear();
+                    break;
+                default:
+                    oled_set_cursor(0, data[1]);
+                    oled_advance_page(true);
+                    break;
+            }
+            break;
+        default:
+            oled_set_cursor(0, data[0]);
+            oled_write(oled_data + 1, false);
+        }
+    //raw_hid_send(data, length);
 }
 #endif
