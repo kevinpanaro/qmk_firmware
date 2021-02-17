@@ -64,6 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // OLED Config
 #define OLED_DISPLAY_ADDRESS 0x3C
+#define OLED_DISPLAY_128X64
 
 // Rotary Encoder
 #define ENCODERS_PAD_A { E6 }
