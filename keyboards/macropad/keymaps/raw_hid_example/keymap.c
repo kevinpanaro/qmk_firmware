@@ -64,7 +64,15 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
 
     switch( data[0] ) {
         case 8:
-            oled_clear();
+            switch( data[1] ) {
+                case 8:
+                    oled_clear();
+                    break;
+                default:
+                    oled_set_cursor(0, data[1]);
+                    oled_advance_page(true);
+                    break;
+            }
             break;
         default:
             oled_set_cursor(0, data[0]);
