@@ -30,9 +30,6 @@ class QMKDevice():
                 self.device = hid.Device(path=device['path'])
                 break
 
-    def _test(self):
-        print(self.vid, self.pid)
-
     def get_device_info(self):
         print("Device manufacturer: {}".format(self.device.manufacturer))
         print("Product: {}".format(self.device.product))
@@ -45,7 +42,6 @@ class QMKDevice():
         self.device.close()
 
     def pad(self, data):
-        print(len(data))
         return data + b'\x00' * (64 - len(data))
 
     def tobyte(self, data):
