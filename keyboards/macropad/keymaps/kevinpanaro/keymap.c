@@ -42,6 +42,7 @@ enum custom_keycodes {
     VAL_COMMEND,
     VAL_VOTE_YES,
     VAL_VOTE_NO,
+    VAL_NO_TIME,
 };
 
 // Tap Dance Declarations
@@ -77,7 +78,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_VALORANT] = LAYOUT(
         MOVE_HOME,
         MEH(KC_F1),   KC_T    ,    KC_U   ,
-        KC_V    ,   KC_W    ,    VAL_COMMEND  ,
+        VAL_NO_TIME ,   KC_W    ,    VAL_COMMEND  ,
         VAL_ULT ,  VAL_NO   ,    VAL_YES
     ),
     [_NUMPAD] = LAYOUT(
@@ -155,6 +156,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 	          } else {
 	          }
 	          return false;
+        case VAL_NO_TIME:
+	          if (record->event.pressed) {
+                register_code(KC_LSHIFT);
+                tap_code(KC_ENT);
+                unregister_code(KC_LSHIFT);
+	              SEND_STRING("NO TIME");
+                tap_code(KC_ENT);
+	          } else {
+	          }
+	          return false;
 	      default:
 	          return true;
     }
@@ -221,6 +232,7 @@ void oled_task_user(void) {
      // Host Keyboard LED Status
      led_t led_state = host_keyboard_led_state();
      oled_write_P(led_state.caps_lock ? PSTR("caps ") : PSTR("     "), false);
+
 }
 #endif
 
