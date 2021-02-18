@@ -18,6 +18,7 @@
     #include "raw_hid.h"
     #include <string.h>
     #define RAW_EPSIZE 64
+    uint8_t pixel_index = 0;
 #endif
 
 // Defines names for use in layer keycodes and the keymap
@@ -208,7 +209,7 @@ void oled_task_user(void) {
     	     oled_write_P(PSTR("default\n"), false);
     	     break;
     	 case _DISCORD:
-    	     oled_write_P(PSTR("discords"), false);
+    	     oled_write_P(PSTR("discord\n"), false);
     	     break;
     	 case _VALORANT:
     	     oled_write_P(PSTR("valorant\n"), false);
@@ -231,7 +232,7 @@ void oled_task_user(void) {
      }
      // Host Keyboard LED Status
      led_t led_state = host_keyboard_led_state();
-     oled_write_P(led_state.caps_lock ? PSTR("caps ") : PSTR("     "), false);
+     oled_write_P(led_state.caps_lock ? PSTR(" caps ") : PSTR(""), false);
 
 }
 #endif
@@ -244,6 +245,40 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     const char *oled_data = (char*)data;
 
     switch( data[0] ) {
+        case 1:
+            oled_set_cursor(0, data[1]);
+            oled_write(oled_data + 2, false);
+            break;
+        case 2:
+            pixel_index = 1;
+            while(pixel_index < RAW_EPSIZE && data[pixel_index] != 0xff){
+                oled_write_pixel(data[pixel_index], data[pixel_index + 1], true);
+                pixel_index += 2;
+            }
+            break;
+        case 3:
+            switch( data[1] ) {
+                case 0:
+                    oled_scroll_off();
+                    break;
+                case 1:
+                    oled_scroll_left();
+                    break;
+                case 2:
+                    oled_scroll_right();
+                    break;
+                case 3:
+                    oled_scroll_left();
+                    break;
+                case 4:
+                    oled_scroll_set_speed(data[2]);
+                    break;
+                case 5:
+                    oled_scroll_set_area(data[2], data[3]);
+                    break;
+                default:
+                    break;
+            }
         case 8:
             switch( data[1] ) {
                 case 8:
@@ -256,9 +291,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             }
             break;
         default:
-            oled_set_cursor(0, data[0]);
-            oled_write(oled_data + 1, false);
+            break;
         }
-    //raw_hid_send(data, length);
 }
 #endif
