@@ -46,6 +46,8 @@ uint8_t screen_data_buffer[64 - 1] =  {0}; // buffer for screen data
 int screen_data_index = 0;     // current index into screen data buffer
 uint8_t start_line = 0;
 uint8_t end_line = 0;
+uint8_t pixel_index = 0;
+
 
 #ifdef OLED_DRIVER_ENABLE
 // void oled_task_user(void) {
@@ -68,8 +70,35 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             oled_write(oled_data + 2, false);
             break;
         case 2:
-            oled_write_pixel(data[1], data[2], true);
+            pixel_index = 1;
+            while(pixel_index < RAW_EPSIZE && data[pixel_index] != 0xff){
+                oled_write_pixel(data[pixel_index], data[pixel_index + 1], true);
+                pixel_index += 2;
+            }
             break;
+        case 3:
+            switch( data[1] ) {
+                case 0:
+                    oled_scroll_off();
+                    break;
+                case 1:
+                    oled_scroll_left();
+                    break;
+                case 2:
+                    oled_scroll_right();
+                    break;
+                case 3:
+                    oled_scroll_left();
+                    break;
+                case 4:
+                    oled_scroll_set_speed(data[2]);
+                    break;
+                case 5:
+                    oled_scroll_set_area(data[2], data[3]);
+                    break;
+                default:
+                    break;
+            }
         case 8:
             switch( data[1] ) {
                 case 8:

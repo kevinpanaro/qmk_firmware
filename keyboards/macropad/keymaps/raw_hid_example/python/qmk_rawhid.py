@@ -10,6 +10,15 @@ from time import sleep
 #   0x0X : X is the row rest of data is byte string to write to that row
 # 0x02 :
 #   0x<column>0x<row> : turn this pixel on.
+# 0x03 : scroll commands
+#   0x00: turn off scroll
+#   0x01: turn on scroll
+#   0x02: scroll right
+#   0x03: scroll left
+#   0x04: scroll speed
+#     0x0X: where x is a value of 0 to 7
+#   0x05: scroll area
+#     0x<start>0x<stop> : start_line and end_line
 # 0x08 : clearing a row
 #   0x0X : where X is the row to clear
 #   0x08 : clear all rows
@@ -29,9 +38,20 @@ class QMKDevice():
         self.usage = _to_int(config['DEVICE']['USAGE'])
         self.raw_epsize = int(config['DEVICE']['RAW_EPSIZE'])
 
-        self.cmd_line  = b'\x01'
-        self.cmd_pixel = b'\x02'
-        self.cmd_erase = b'\x08'
+        self.cmd_line   = b'\x01'
+
+        self.cmd_pixel  = b'\x02'
+        self.end_pixel  = b'\xff'
+
+        self.cmd_scroll = b'\x03'
+        self.scroll_on  = b'\x01'
+        self.scroll_off = b'\x00'
+        self.scroll_lft = b'\x03'
+        self.scroll_rgt = b'\x02'
+        self.scrl_speed = b'\x04'
+        self.scrl_area  = b'\x05'
+
+        self.cmd_erase  = b'\x08'
 
         devices = hid.enumerate()
         for device in devices:
@@ -45,6 +65,7 @@ class QMKDevice():
                 break
 
 
+
     def get_device_info(self):
         print("Device manufacturer: {}".format(self.device.manufacturer))
         print("Product: {}".format(self.device.product))
@@ -52,6 +73,7 @@ class QMKDevice():
     def write(self, data):
         '''write to device'''
         data = self.tobytes(data)
+        # self.scroll_off()
         self.device.write(data)
 
     def close(self):
@@ -84,19 +106,47 @@ class QMKDevice():
     def clear_line(self, line):
         '''clears a given line'''
         data = [self.cmd_erase, line]
-        self.device.write(data)
+        self.write(data)
 
-    def send_pixel(self, pixel, offset):
+    def send_pixels(self, pixels, offset=(0,0)):
         '''turns on one pixel'''
-        pixel = list(sum(x) for x in zip(pixel, offset))
-        pixel.insert(0, self.cmd_pixel)
-        self.write(pixel)
+        data = []
+        for pixel in pixels:
+            data += list(sum(x) for x in zip(pixel, offset))
+        data.insert(0, self.cmd_pixel)
+        data.append(self.end_pixel)
+        self.write(data)
 
     def send_line(self, line, data):
         '''sends data to a line'''
         self.clear_line(line)
         data = [self.cmd_line, line, data]
         self.write(data)
+
+    def scroll_on(self):
+        data = [self.cmd_scroll, self.scroll_on]
+        self.write(data)
+
+    def scroll_off(self):
+        data = [self.cmd_scroll, self.scroll_off]
+        self.write(data)
+
+    def scroll_right(self):
+        data = [self.cmd_scroll, self.scroll_rgt]
+        self.write(data)
+
+    def scroll_left(self):
+        data = [self.cmd_scroll, self.scroll_lft]
+        self.write(data)
+
+    def scroll_speed(self, speed):
+        data = [self.cmd_scroll, self.scrl_speed, speed]
+        self.write(data)
+
+    def scroll_area(self, start, end):
+        data = [self.cmd_scroll, self.scrl_area, start, end]
+        self.write(data)
+
 
 
 def main():
@@ -108,7 +158,11 @@ def main():
     try:
         me = QMKDevice(config_path)
         me.clear_screen()
-        me.send(data=b'It works!', line=2)
+        me.send_line(line=3, data=b'Hello!')
+        # me.send_line(line=7, data=b'Artist :  Michael Nau')
+        # me.scroll_area(start=0, end=7)
+        # me.send_line(line=4, data=b' scroll')
+        # me.scroll_right()
 
 
 
