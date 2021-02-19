@@ -11,13 +11,13 @@ from time import sleep
 # 0x02 :
 #   0x<column>0x<row> : turn this pixel on.
 # 0x03 : scroll commands
-#   0x00: turn off scroll
-#   0x01: turn on scroll
-#   0x02: scroll right
-#   0x03: scroll left
-#   0x04: scroll speed
+#   0x01: turn off scroll
+#   0x02: turn on scroll
+#   0x03: scroll right
+#   0x04: scroll left
+#   0x05: scroll speed
 #     0x0X: where x is a value of 0 to 7
-#   0x05: scroll area
+#   0x06: scroll area
 #     0x<start>0x<stop> : start_line and end_line
 # 0x04 : oled set brightness
 #   0x0x : brightness value
@@ -52,10 +52,10 @@ class QMKDevice():
         self.end_pixel  = b'\xff'
 
         self.cmd_scroll = b'\x03'
-        self.scroll_on  = b'\x02'
         self.scroll_off = b'\x01'
-        self.scroll_lft = b'\x04'
+        self.scroll_on  = b'\x02'
         self.scroll_rgt = b'\x03'
+        self.scroll_lft = b'\x04'
         self.scrl_speed = b'\x05'
         self.scrl_area  = b'\x06'
 
