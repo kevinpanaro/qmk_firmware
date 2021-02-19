@@ -17,7 +17,7 @@
 #ifdef RAW_ENABLE
     #include "raw_hid.h"
     #include <string.h>
-    #define RAW_EPSIZE 64
+    #define RAW_EPSIZE 32
     uint8_t pixel_index = 0;
 #endif
 
