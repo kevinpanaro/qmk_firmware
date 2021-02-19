@@ -18,7 +18,7 @@
 #ifdef RAW_ENABLE
     #include "raw_hid.h"
     #include <string.h>
-    #define RAW_EPSIZE 64
+    #define RAW_EPSIZE 32
 #endif
 
 // Defines names for use in layer keycodes and the keymap
@@ -63,6 +63,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     // if we are here, the pc is connected
     is_hid_connected = true;
     const char *oled_data = (char*)data;
+    uint8_t send_data[RAW_EPSIZE] = {0};
 
     switch( data[0] ) {
         case 1:
@@ -77,24 +78,47 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             }
             break;
         case 3:
+        // this section is so buggy, please use at own risk
             switch( data[1] ) {
-                case 0:
+                case 1:
                     oled_scroll_off();
                     break;
-                case 1:
-                    oled_scroll_left();
-                    break;
                 case 2:
-                    oled_scroll_right();
+                    oled_scroll_left();
                     break;
                 case 3:
-                    oled_scroll_left();
+                    oled_scroll_right();
                     break;
                 case 4:
-                    oled_scroll_set_speed(data[2]);
+                    oled_scroll_left();
                     break;
                 case 5:
+                    oled_scroll_set_speed(data[2]);
+                    break;
+                case 6:
                     oled_scroll_set_area(data[2], data[3]);
+                    break;
+                default:
+                    break;
+            }
+        case 4:
+            oled_set_brightness(data[1]);
+            break;
+        case 5:
+            switch( data[1] ) {
+                case 1:
+                    if ( is_oled_on() ) {
+                        send_data[0] = 1;
+                    } else {
+                        send_data[0] = 0;
+                    }
+                    raw_hid_send(send_data, length);
+                    break;
+                case 2:
+                    oled_on();
+                    break;
+                case 3:
+                    oled_off();
                     break;
                 default:
                     break;
