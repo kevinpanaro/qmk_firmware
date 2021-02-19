@@ -27,6 +27,15 @@ enum layer_names {
     _BASE=0,
 };
 
+enum raw_hid_commands {
+    WRITE=1,
+    PIXEL=2,
+    SCROLL=3,
+    BRIGHTNESS=4,
+    QUERY=5,
+    CLEAR=8,
+};
+
 #define num_of_layers = Enum.GetNames(typeof(layer_names)).Length
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -64,20 +73,21 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     is_hid_connected = true;
     const char *oled_data = (char*)data;
     uint8_t send_data[RAW_EPSIZE] = {0};
+    uint8_t command = data[0];
 
-    switch( data[0] ) {
-        case 1:
+    switch( command ) {
+        case WRITE:
             oled_set_cursor(0, data[1]);
             oled_write(oled_data + 2, false);
             break;
-        case 2:
+        case PIXEL:
             pixel_index = 1;
             while(pixel_index < RAW_EPSIZE && data[pixel_index] != 0xff){
                 oled_write_pixel(data[pixel_index], data[pixel_index + 1], true);
                 pixel_index += 2;
             }
             break;
-        case 3:
+        case SCROLL:
         // this section is so buggy, please use at own risk
             switch( data[1] ) {
                 case 1:
@@ -101,10 +111,10 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                 default:
                     break;
             }
-        case 4:
+        case BRIGHTNESS:
             oled_set_brightness(data[1]);
             break;
-        case 5:
+        case QUERY:
             switch( data[1] ) {
                 case 1:
                     if ( is_oled_on() ) {
@@ -123,7 +133,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                 default:
                     break;
             }
-        case 8:
+        case CLEAR:
             switch( data[1] ) {
                 case 8:
                     oled_clear();
