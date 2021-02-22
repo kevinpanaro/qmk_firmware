@@ -300,6 +300,18 @@ class QMKDevice():
         max_lines = self.write_then_read(data)
         return max_lines
 
+    def draw_picture(self, file_path, origin):
+        '''draws a binary image onto the screen'''
+        pixels = []
+        offset = origin
+        with open(file_path) as f:
+            lines = f.readlines()
+
+        for pixel_y, line in enumerate(lines):
+            for pixel_x, bit in enumerate(line):
+                if bit == '1':
+                    pixels.append((pixel_x, pixel_y))
+        self.turn_pixels_on(pixels=pixels, offset=offset)
 
 
 def main():
@@ -311,22 +323,7 @@ def main():
     try:
         me = QMKDevice(config_path)
         me.clear_screen()
-        # me.send_line(line=0, data="Slave to the Traffic Light")
-        # me.turn_pixels_on(pixels=[(0,0)], offset=(127,63))
-        # for x in range(64):
-        #     draw_x = x
-        #     draw_y = x
-        #     me.turn_pixels_on(pixels=[(0,0)], offset=(64+draw_x, 63))
-        #     me.turn_pixels_on(pixels=[(0,0)], offset=(64+draw_x, 0))
-        #     me.turn_pixels_on(pixels=[(0,0)], offset=(64, draw_y))
-        #     me.turn_pixels_on(pixels=[(0,0)], offset=(127, draw_y))
-        #     me.turn_pixels_on(pixels=[(0,0)], offset=(64+draw_x, draw_y))
-        # for x in range(8):
-        #     me.send_line(line=x, data='123456789012345678901')
-        # print(me.oled_max_chars())
-        # print(me.oled_get_brightness())
-        # print(me.get_oled_state())
-
+        me.draw_picture(file_path='billybreathes.txt', origin=(0,0))
 
 
 
