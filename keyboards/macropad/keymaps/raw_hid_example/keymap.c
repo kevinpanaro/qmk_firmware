@@ -124,6 +124,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                 default:
                     break;
             }
+            break;
         case BRIGHTNESS:
             oled_set_brightness(data[1]);
             break;
@@ -152,9 +153,18 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                     send_data[0] = oled_get_brightness();
                     raw_hid_send(send_data, length);
                     break;
+                case 6:
+                    send_data[0] = oled_max_chars();
+                    raw_hid_send(send_data, length);
+                    break;
+                case 7:
+                    send_data[0] = oled_max_lines();
+                    raw_hid_send(send_data, length);
+                    break;
                 default:
                     break;
             }
+            break;
         case CLEAR:
             switch( data[1] ) {
                 case 8:
