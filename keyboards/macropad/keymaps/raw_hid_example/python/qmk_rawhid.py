@@ -70,6 +70,8 @@ class QMKDevice():
         self.oled_off   = b'\x03'
         self.layer      = b'\x04'
         self.brightness = b'\x05'
+        self.max_chars  = b'\x06'
+        self.max_lines  = b'\x07'
 
         self.cmd_erase  = b'\x08'
 
@@ -100,6 +102,7 @@ class QMKDevice():
         return self.device.read(self.raw_epsize)
 
     def write_then_read(self, data):
+        ''' used for getting info about the state of the device'''
         self.write(data)
         data = self.read()
         data = int.from_bytes(data, 'little')
@@ -173,32 +176,32 @@ class QMKDevice():
         DO NOT DO THIS unless you know what you are sending'''
         self.device.write(data)
 
-    def stop_scroll(self):
+    def oled_scroll_off(self):
         '''stops oled scroll'''
         data = [self.cmd_scroll, self.scroll_off]
         self.write(data)
 
-    def scroll_right(self):
+    def oled_scroll_right(self):
         '''scrolls oled buffer right'''
         data = [self.cmd_scroll, self.scroll_rgt]
         self.write(data)
 
-    def scroll_left(self):
+    def oled_scroll_left(self):
         '''scrolls oled buffer left'''
         data = [self.cmd_scroll, self.scroll_lft]
         self.write(data)
 
-    def scroll_speed(self, speed):
+    def oled_scroll_set_speed(self, speed):
         '''sets oled scroll speed'''
         data = [self.cmd_scroll, self.scrl_speed, speed]
         self.write(data)
 
-    def scroll_area(self, start, end):
+    def oled_scroll_set_area(self, start, end):
         '''defines oled scroll area'''
         data = [self.cmd_scroll, self.scrl_area, start, end]
         self.write(data)
 
-    def set_brightness(self, brightness):
+    def oled_set_brightness(self, brightness):
         '''sets the oled brightness'''
         if not 0 <= brightness <= 255:
             raise Exception("Invalid value: {}".format(brightness))
@@ -261,7 +264,7 @@ class QMKDevice():
             return(False)
 
     def turn_oled_on(self):
-        ''' turns on oled and waits .5 seconds before doing anything'''
+        '''turns on oled and waits .5 seconds before doing anything'''
         data = [self.query, self.oled_on]
         self.write(data)
         sleep(.5)
@@ -273,16 +276,29 @@ class QMKDevice():
         sleep(.2)
 
     def get_layer(self):
+        '''get highest layer
+        you'll need to know what each layer'''
         data = [self.query, self.layer]
         layer = self.write_then_read(data)
         return layer
 
-    def get_brightness(self):
+    def oled_get_brightness(self):
+        '''get oled brightness'''
         data = [self.query, self.brightness]
         brightness = self.write_then_read(data)
         return brightness
 
+    def oled_max_chars(self):
+        '''get oled maximum number of characters that will fit on a line'''
+        data = [self.query, self.max_chars]
+        max_chars = self.write_then_read(data)
+        return max_chars
 
+    def oled_max_lines(self):
+        '''get the maximum number of lines that will fit on the OLED'''
+        data = [self.query, self.max_lines]
+        max_lines = self.write_then_read(data)
+        return max_lines
 
 
 
@@ -294,7 +310,7 @@ def main():
 
     try:
         me = QMKDevice(config_path)
-        # me.clear_screen()
+        me.clear_screen()
         # me.send_line(line=0, data="Slave to the Traffic Light")
         # me.turn_pixels_on(pixels=[(0,0)], offset=(127,63))
         # for x in range(64):
@@ -305,9 +321,11 @@ def main():
         #     me.turn_pixels_on(pixels=[(0,0)], offset=(64, draw_y))
         #     me.turn_pixels_on(pixels=[(0,0)], offset=(127, draw_y))
         #     me.turn_pixels_on(pixels=[(0,0)], offset=(64+draw_x, draw_y))
-        me.set_brightness(255)
-        print(me.get_brightness())
-        print(me.get_oled_state())
+        # for x in range(8):
+        #     me.send_line(line=x, data='123456789012345678901')
+        # print(me.oled_max_chars())
+        # print(me.oled_get_brightness())
+        # print(me.get_oled_state())
 
 
 
