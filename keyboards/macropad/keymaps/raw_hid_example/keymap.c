@@ -25,6 +25,7 @@
 // if you add a layer here, make sure to update the num_of_layers definition
 enum layer_names {
     _BASE=0,
+    _TEST=1,
 };
 
 enum raw_hid_commands {
@@ -44,6 +45,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_0    ,                         \
         KC_7    ,   KC_8    ,    KC_9   , \
         KC_4    ,   KC_5    ,    KC_6   , \
+        KC_1    ,   KC_2    ,    MO(_TEST)     \
+    ),
+    [_TEST] = LAYOUT(                     \
+        RESET   ,                         \
+        KC_7    ,   KC_8    ,    KC_9   , \
+        KC_4    ,   KC_5    ,    KC_6   , \
         KC_1    ,   KC_2    ,    KC_3     \
     )
 };
@@ -56,6 +63,7 @@ int screen_data_index = 0;     // current index into screen data buffer
 uint8_t start_line = 0;
 uint8_t end_line = 0;
 uint8_t pixel_index = 0;
+bool pixel_state = true;
 
 
 #ifdef OLED_DRIVER_ENABLE
@@ -81,9 +89,14 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             oled_write(oled_data + 2, false);
             break;
         case PIXEL:
-            pixel_index = 1;
+            if ( data[1] ) {
+                pixel_state = true;
+            } else {
+                pixel_state = false;
+            }
+            pixel_index = 2;
             while(pixel_index < RAW_EPSIZE && data[pixel_index] != 0xff){
-                oled_write_pixel(data[pixel_index], data[pixel_index + 1], true);
+                oled_write_pixel(data[pixel_index], data[pixel_index + 1], pixel_state);
                 pixel_index += 2;
             }
             break;
@@ -129,6 +142,15 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
                     break;
                 case 3:
                     oled_off();
+                    break;
+                case 4:
+                    // current layer
+                    send_data[0] = get_highest_layer(layer_state);
+                    raw_hid_send(send_data, length);
+                case 5:
+                    // current brightness
+                    send_data[0] = oled_get_brightness();
+                    raw_hid_send(send_data, length);
                     break;
                 default:
                     break;
