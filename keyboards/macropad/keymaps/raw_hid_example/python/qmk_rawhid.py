@@ -49,6 +49,8 @@ class QMKDevice():
         self.cols = int(config['DEVICE']['COLUMNS'])
         self.rows = int(config['DEVICE']['ROWS'])
 
+        self.report_id  = b'\x00'
+
         self.cmd_line   = b'\x01'
 
         self.cmd_pixel  = b'\x02'
@@ -97,9 +99,9 @@ class QMKDevice():
         data = self.tobytes(data)
         self.device.write(data)
 
-    def read(self):
-        '''reads from device'''
-        return self.device.read(self.raw_epsize)
+    def read(self, timeout=None):
+        '''reads from device, timeout in ms'''
+        return self.device.read(size=self.raw_epsize, timeout=timeout)
 
     def write_then_read(self, data):
         ''' used for getting info about the state of the device'''
@@ -114,7 +116,8 @@ class QMKDevice():
 
     def pad(self, data):
         '''pad the data just before it's send'''
-        return data + b'\x00' * (self.raw_epsize - len(data))
+        data = self.report_id + data + b'\x00' * (self.raw_epsize - len(data))
+        return data
 
     def tobyte(self, data):
         if type(data) is bytes:
@@ -323,7 +326,11 @@ def main():
     try:
         me = QMKDevice(config_path)
         me.clear_screen()
-        me.draw_picture(file_path='billybreathes.txt', origin=(0,0))
+        # me.send_line(line=0, data='Hello World!')
+        # me.draw_picture(file_path='billybreathes.txt', origin=(0,0))
+        # me.get_device_info()
+        print(me.read())
+        # print(me.get_layer())
 
 
 
