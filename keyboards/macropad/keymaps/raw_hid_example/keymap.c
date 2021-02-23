@@ -45,13 +45,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_0    ,                         \
         KC_7    ,   KC_8    ,    KC_9   , \
         KC_4    ,   KC_5    ,    KC_6   , \
-        KC_1    ,   KC_2    ,    MO(_TEST)     \
+        KC_1    ,   KC_2    ,    TO(_TEST)     \
     ),
     [_TEST] = LAYOUT(                     \
         RESET   ,                         \
         KC_7    ,   KC_8    ,    KC_9   , \
         KC_4    ,   KC_5    ,    KC_6   , \
-        KC_1    ,   KC_2    ,    KC_3     \
+        KC_1    ,   TO(_BASE)    ,    KC_3     \
     )
 };
 
@@ -65,13 +65,45 @@ uint8_t end_line = 0;
 uint8_t pixel_index = 0;
 bool pixel_state = true;
 
+void raw_hid_send_current_layer(uint8_t layer) {
+    if (is_hid_connected) {
+        uint8_t send_data[RAW_EPSIZE] = {0};
+        send_data[0] = layer;
+        raw_hid_send(send_data, sizeof(send_data));
+    }
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    uint8_t current_layer = get_highest_layer(state);
+    raw_hid_send_current_layer(current_layer);
+    switch(current_layer) {
+        case _BASE:
+            break;
+        case _TEST:
+            break;
+        default:
+            break;
+    }
+    return state;
+}
+
 
 #ifdef OLED_DRIVER_ENABLE
-// void oled_task_user(void) {
-//     // Host Keyboard LED Status
-//     led_t led_state = host_keyboard_led_state();
-//     oled_write_P(led_state.caps_lock ? PSTR("caps ") : PSTR(" "), false);
-// }
+void oled_task_user(void) {
+     oled_write_P(PSTR("layer: "), false);
+
+
+     switch (get_highest_layer(layer_state)) {
+    	 case _BASE:
+    	     oled_write_P(PSTR("0\n"), false);
+    	     break;
+    	 case _TEST:
+    	     oled_write_P(PSTR("1\n"), false);
+    	     break;
+       default:
+           break;
+      }
+}
 #endif
 
 #ifdef RAW_ENABLE
