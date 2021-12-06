@@ -96,9 +96,11 @@ compile_commands.json
 keyboards/*
 !keyboards/macropad
 !keyboards/sofle
-!keyboards/1upkeyboards
+!keyboards/1upkeyboards/1up60hse
 config.ini
 creds.json
 spot.py
 __avr_gdbinit
 notes.txt
+
+.gitignore
