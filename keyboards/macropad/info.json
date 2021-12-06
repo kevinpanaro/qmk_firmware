@@ -2,15 +2,21 @@
     "keyboard_name": "macropad",
     "url": "",
     "maintainer": "Kevin Panaro",
+    "width": 4,
+    "height": 4,
     "layouts": {
         "LAYOUT": {
             "layout": [
                 {"label": "k00", "x": 0, "y": 0},
-                {"label": "k01", "x": 1, "y": 0},
-                {"label": "k02", "x": 2, "y": 0},
-
-                {"label": "k10", "x": 0, "y": 1, "w": 1.5},
-                {"label": "k12", "x": 1.5, "y": 1, "w": 1.5}
+                {"label": "k11", "x": 1, "y": 1},
+                {"label": "k12", "x": 1, "y": 2},
+                {"label": "k13", "x": 1, "y": 3},
+                {"label": "k21", "x": 2, "y": 1},
+                {"label": "k22", "x": 2, "y": 2},
+                {"label": "k23", "x": 2, "y": 3},
+                {"label": "k31", "x": 3, "y": 1},
+                {"label": "k32", "x": 3, "y": 2},
+                {"label": "k33", "x": 3, "y": 3}
             ]
         }
     }
