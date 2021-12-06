@@ -101,3 +101,4 @@ config.ini
 creds.json
 spot.py
 __avr_gdbinit
+notes.txt
