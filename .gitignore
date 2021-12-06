@@ -91,3 +91,11 @@ user_song_list.h
 compile_commands.json
 .clangd/
 .cache/
+
+# ignore everything but my keyboard and other things i don't want tracked.
+keyboards/*
+!keyboards/macropad
+config.ini
+creds.json
+spot.py
+__avr_gdbinit
