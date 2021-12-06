@@ -95,6 +95,8 @@ compile_commands.json
 # ignore everything but my keyboard and other things i don't want tracked.
 keyboards/*
 !keyboards/macropad
+!keyboards/sofle
+!keyboards/1upkeyboards
 config.ini
 creds.json
 spot.py
