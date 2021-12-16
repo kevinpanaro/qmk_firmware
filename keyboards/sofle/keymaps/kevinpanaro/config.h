@@ -40,8 +40,9 @@ for more options.
 
 #ifdef RGBLIGHT_ENABLE
 #define RGBLIGHT_SPLIT
-#define RGBLED_NUM 72
-#define RGB_SPLIT {36,36}
+// #define RGBLED_NUM 72
+// #define RGB_SPLIT {36,36}
+#define RGB_SPLIT {36,35}
 #define RGBLIGHT_LIMIT_VAL 120
 //   #define RGBLIGHT_SLEEP  /* If defined, the RGB lighting will be switched off when the host goes to sleep */
 // /*== all animations enable ==*/
