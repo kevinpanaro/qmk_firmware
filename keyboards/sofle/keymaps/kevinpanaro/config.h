@@ -26,19 +26,19 @@ for more options.
 
 #define RGBLED_NUM 71 // when soldering i destroyed the pad of the right side indicator. which is why this is 71. changes also made in rev 1
 #define DRIVER_LED_TOTAL RGBLED_NUM
-#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 120 // limits maximum brightness of LEDs to 150 out of 255. Higher may cause the controller to crash.
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150 // limits maximum brightness of LEDs to 150 out of 255. Higher may cause the controller to crash.
 #define RGB_MATRIX_HUE_STEP 8
 #define RGB_MATRIX_SAT_STEP 8
 #define RGB_MATRIX_VAL_STEP 8
 #define RGB_MATRIX_SPD_STEP 10
 #define RGB_MATRIX_KEYPRESSES
-#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+//#define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 #define RGB_MATRIX_SPLIT {36,35}
 #define SPLIT_TRANSPORT_MIRROR
-#define ENABLE_RGB_MATRIX_SPLASH
 #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 #define ENABLE_RGB_MATRIX_GRADIENT_UP_DOWN
-#define ENABLE_RGB_MATRIX_RAINBOW_BEACON
+#define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+#define ENABLE_RGB_MATRIX_CYCLE_OUT_IN
 #endif
 
 #ifdef RGBLIGHT_ENABLE
@@ -65,3 +65,10 @@ for more options.
 
 #define USB_POLLING_INTERVAL_MS 1
 #define QMK_KEYS_PER_SCAN 12
+
+// potential space saving undefs
+#undef LOCKING_SUPPORT_ENABLE
+#undef LOCKING_RESYNC_ENABLE
+
+// this limits the number of layers the keyboard can use to 8. save some space.
+#define LAYER_STATE_8BIT
