@@ -28,9 +28,6 @@ enum sofle_layers {
 };
 
 enum custom_keycodes {
-    // KC_QWERTY = SAFE_RANGE,
-    // KC_VALORANT,
-    // KC_APEX,
     KC_LOWER = SAFE_RANGE,
     KC_RAISE,
     KC_ADJUST,
@@ -268,21 +265,6 @@ bool oled_task_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        // case KC_QWERTY:
-        //     if (record->event.pressed) {
-        //         set_single_persistent_default_layer(_QWERTY);
-        //     }
-        //     return false;
-        // case KC_VALORANT:
-        //     if (record->event.pressed) {
-        //         set_single_persistent_default_layer(_VALORANT);
-        //     }
-        //     return false;
-        // case KC_APEX:
-        //     if (record->event.pressed) {
-        //         set_single_persistent_default_layer(_APEX);
-        //     }
-        //     return false;
         case KC_LOWER:
             if (record->event.pressed) {
                 layer_on(_LOWER);
