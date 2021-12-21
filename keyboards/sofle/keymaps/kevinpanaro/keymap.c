@@ -28,10 +28,10 @@ enum sofle_layers {
 };
 
 enum custom_keycodes {
-    KC_QWERTY = SAFE_RANGE,
-    KC_VALORANT,
-    KC_APEX,
-    KC_LOWER,
+    // KC_QWERTY = SAFE_RANGE,
+    // KC_VALORANT,
+    // KC_APEX,
+    KC_LOWER = SAFE_RANGE,
     KC_RAISE,
     KC_ADJUST,
     KC_PRVWD,
@@ -173,8 +173,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *            `----------------------------------'           '------''---------------------------'
  */
   [_ADJUST] = LAYOUT(
-  XXXXXXX , XXXXXXX,KC_VALORANT , KC_APEX , XXXXXXX, XXXXXXX,                     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  RESET   , XXXXXXX,  KC_QWERTY , XXXXXXX , XXXXXXX, XXXXXXX,                     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  XXXXXXX , XXXXXXX,DF(_VALORANT) ,DF(_APEX) , XXXXXXX, XXXXXXX,                     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  RESET   , XXXXXXX, DF(_QWERTY) , XXXXXXX , XXXXXXX, XXXXXXX,                     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   XXXXXXX , XXXXXXX,  XXXXXXX   , XXXXXXX , XXXXXXX, XXXXXXX,                     XXXXXXX, KC_VOLD, KC_MUTE, KC_VOLU, XXXXXXX, XXXXXXX,
   XXXXXXX , XXXXXXX,  XXXXXXX   , XXXXXXX , XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
                    _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______
@@ -268,21 +268,21 @@ bool oled_task_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case KC_QWERTY:
-            if (record->event.pressed) {
-                set_single_persistent_default_layer(_QWERTY);
-            }
-            return false;
-        case KC_VALORANT:
-            if (record->event.pressed) {
-                set_single_persistent_default_layer(_VALORANT);
-            }
-            return false;
-        case KC_APEX:
-            if (record->event.pressed) {
-                set_single_persistent_default_layer(_APEX);
-            }
-            return false;
+        // case KC_QWERTY:
+        //     if (record->event.pressed) {
+        //         set_single_persistent_default_layer(_QWERTY);
+        //     }
+        //     return false;
+        // case KC_VALORANT:
+        //     if (record->event.pressed) {
+        //         set_single_persistent_default_layer(_VALORANT);
+        //     }
+        //     return false;
+        // case KC_APEX:
+        //     if (record->event.pressed) {
+        //         set_single_persistent_default_layer(_APEX);
+        //     }
+        //     return false;
         case KC_LOWER:
             if (record->event.pressed) {
                 layer_on(_LOWER);
