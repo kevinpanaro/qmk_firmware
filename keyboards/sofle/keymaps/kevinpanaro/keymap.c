@@ -16,6 +16,13 @@
 
 #include QMK_KEYBOARD_H
 #include <stdio.h>
+#ifdef RAW_ENABLE
+    #include "raw_hid.h"
+    #include <string.h>
+    #define RAW_EPSIZE 32
+    uint8_t pixel_index = 0;
+    bool pixel_state = true;
+#endif
 
 enum sofle_layers {
     /* _M_XYZ = Mac Os, _W_XYZ = Win/Linux */
@@ -43,7 +50,21 @@ enum {
     TD_T_G,
 };
 
+enum raw_hid_commands {
+    WRITE=1,
+    PIXEL=2,
+    SCROLL=3,
+    BRIGHTNESS=4,
+    QUERY=5,
+    LAYER=6,
+    EXIT=7,
+    CLEAR=8,
+};
+
+bool is_hid_connected = false; // is pc connected yet?
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+
 /*
  * QWERTY
  * ,-----------------------------------------.                    ,-----------------------------------------.
@@ -203,7 +224,13 @@ void render_rgb_status(void) {
 static void print_status_narrow(void) {
     // Print current mode
     oled_write_P(PSTR("Sofle"), false);
-    oled_write_P(PSTR("\n\n\n"), false);
+    oled_advance_page(true);
+    if ( is_hid_connected ) {
+            oled_write_char(0x04, false);
+            oled_write_P(PSTR("\n\n\n"), false);
+        } else {
+            oled_write_P(PSTR("\n\n\n"), false);
+        }
     switch (get_highest_layer(default_layer_state)) {
         case _QWERTY:
             oled_write_ln_P(PSTR("QWERT"), false);
@@ -435,4 +462,21 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     return true;
 }
 
+#endif
+
+#if RAW_ENABLE
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    is_hid_connected = true;
+    // const char *oled_data = (char*)data;
+    // uint8_t send_data[RAW_EPSIZE] = {0};
+    uint8_t command = data[0];
+    switch( command ) {
+        case EXIT:
+            is_hid_connected = false;
+            break;
+    default:
+        break;
+    }
+    raw_hid_send(data, length);
+}   
 #endif
