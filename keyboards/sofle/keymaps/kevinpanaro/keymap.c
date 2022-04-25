@@ -203,6 +203,11 @@ qk_tap_dance_action_t tap_dance_actions[] = {
     [TD_T_G] = ACTION_TAP_DANCE_DOUBLE(KC_T, KC_G),
 };
 
+void activate_layer(uint8_t layer) {
+    set_single_persistent_default_layer(layer);
+    // raw_hid_send_current_layer();
+}
+
 #ifdef OLED_ENABLE
 static void render_logo(void) {
     static const char PROGMEM raw_logo[] = {
@@ -473,6 +478,9 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     switch( command ) {
         case EXIT:
             is_hid_connected = false;
+            break;
+        case LAYER:
+            activate_layer(data[1]);
             break;
     default:
         break;
