@@ -46,9 +46,9 @@ enum custom_keycodes {
 };
 
 // Tap Dance Declarations
-enum {
-    TD_T_G,
-};
+// enum {
+//     TD_T_G,
+// };
 
 enum raw_hid_commands {
     WRITE=1,
@@ -199,9 +199,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 };
 
-qk_tap_dance_action_t tap_dance_actions[] = {
-    [TD_T_G] = ACTION_TAP_DANCE_DOUBLE(KC_T, KC_G),
-};
+// qk_tap_dance_action_t tap_dance_actions[] = {
+//     [TD_T_G] = ACTION_TAP_DANCE_DOUBLE(KC_T, KC_G),
+// };
 
 void activate_layer(uint8_t layer) {
     set_single_persistent_default_layer(layer);
@@ -228,8 +228,7 @@ void render_rgb_status(void) {
 
 static void print_status_narrow(void) {
     // Print current mode
-    oled_write_P(PSTR("Sofle"), false);
-    oled_advance_page(true);
+    oled_write_ln_P(PSTR("Sofle"), false);
     if ( is_hid_connected ) {
             oled_write_char(0x04, false);
             oled_write_P(PSTR("\n\n\n"), false);
@@ -238,7 +237,7 @@ static void print_status_narrow(void) {
         }
     switch (get_highest_layer(default_layer_state)) {
         case _QWERTY:
-            oled_write_ln_P(PSTR("QWERT"), false);
+            oled_write_P(PSTR("QWERT"), false);
             break;
         case _VALORANT:
             oled_write_ln_P(PSTR("VAL"), false);
@@ -247,29 +246,29 @@ static void print_status_narrow(void) {
             oled_write_ln_P(PSTR("APEX"), false);
             break;
         default:
-            oled_write_ln_P(PSTR("Undef"), false);
+            oled_write_ln_P(PSTR("null"), false);
     }
     oled_write_P(PSTR("\n\n"), false);
     // Print current layer
-    oled_write_ln_P(PSTR("Layer"), false);
+    // oled_write_ln_P(PSTR("Layer"), false);
     switch (get_highest_layer(layer_state)) {
         case _QWERTY:
-            oled_write_P(PSTR("Base\n"), false);
+            oled_write_ln_P(PSTR("Base"), false);
             break;
         case _RAISE:
-            oled_write_P(PSTR("Raise"), false);
+            oled_write_ln_P(PSTR("Raise"), false);
             break;
         case _LOWER:
-            oled_write_P(PSTR("Lower"), false);
+            oled_write_ln_P(PSTR("Lower"), false);
             break;
         case _ADJUST:
-            oled_write_P(PSTR("Adj\n"), false);
+            oled_write_ln_P(PSTR("Adj"), false);
             break;
         default:
-            oled_write_ln_P(PSTR("Undef"), false);
+            oled_write_ln_P(PSTR("null"), false);
     }
-    // render_rgb_status();
-    oled_write_P(PSTR("\n\n"), false);
+    //render_rgb_status();
+    //oled_write_P(PSTR("\n\n"), false);
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
