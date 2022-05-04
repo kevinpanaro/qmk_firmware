@@ -45,11 +45,6 @@ enum custom_keycodes {
     KC_DLINE
 };
 
-// Tap Dance Declarations
-// enum {
-//     TD_T_G,
-// };
-
 enum raw_hid_commands {
     WRITE=1,
     PIXEL=2,
@@ -199,10 +194,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 };
 
-// qk_tap_dance_action_t tap_dance_actions[] = {
-//     [TD_T_G] = ACTION_TAP_DANCE_DOUBLE(KC_T, KC_G),
-// };
-
 void activate_layer(uint8_t layer) {
     set_single_persistent_default_layer(layer);
     // raw_hid_send_current_layer();
@@ -228,44 +219,48 @@ void render_rgb_status(void) {
 
 static void print_status_narrow(void) {
     // Print current mode
-    oled_write_ln_P(PSTR("Sofle"), false);
+    oled_write_P(PSTR("Sofle"), false);
+    
+    oled_set_cursor(0, 2);
     if ( is_hid_connected ) {
             oled_write_char(0x04, false);
-            oled_write_P(PSTR("\n\n\n"), false);
+            // oled_write_P(PSTR("\n\n\n"), false);
         } else {
-            oled_write_P(PSTR("\n\n\n"), false);
+            oled_write_P(PSTR(" "), false);
         }
+
+    oled_set_cursor(0, 4);
     switch (get_highest_layer(default_layer_state)) {
         case _QWERTY:
             oled_write_P(PSTR("QWERT"), false);
             break;
         case _VALORANT:
-            oled_write_ln_P(PSTR("VAL"), false);
+            oled_write_P(PSTR("VAL  "), false);
             break;
         case _APEX:
-            oled_write_ln_P(PSTR("APEX"), false);
+            oled_write_P(PSTR("APEX "), false);
             break;
         default:
-            oled_write_ln_P(PSTR("null"), false);
+            oled_write_P(PSTR("null "), false);
     }
-    oled_write_P(PSTR("\n\n"), false);
+    oled_set_cursor(0, 6);
+    // oled_write_P(PSTR("\n\n"), false);
     // Print current layer
-    // oled_write_ln_P(PSTR("Layer"), false);
     switch (get_highest_layer(layer_state)) {
         case _QWERTY:
-            oled_write_ln_P(PSTR("Base"), false);
+            oled_write_P(PSTR("Base "), false);
             break;
         case _RAISE:
-            oled_write_ln_P(PSTR("Raise"), false);
+            oled_write_P(PSTR("Raise"), false);
             break;
         case _LOWER:
-            oled_write_ln_P(PSTR("Lower"), false);
+            oled_write_P(PSTR("Lower"), false);
             break;
         case _ADJUST:
-            oled_write_ln_P(PSTR("Adj"), false);
+            oled_write_P(PSTR("Adj  "), false);
             break;
         default:
-            oled_write_ln_P(PSTR("null"), false);
+            oled_write_P(PSTR("null "), false);
     }
     //render_rgb_status();
     //oled_write_P(PSTR("\n\n"), false);
@@ -471,18 +466,73 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 #if RAW_ENABLE
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     is_hid_connected = true;
-    // const char *oled_data = (char*)data;
-    // uint8_t send_data[RAW_EPSIZE] = {0};
+    const char *oled_data = (char*)data;
+    uint8_t send_data[RAW_EPSIZE] = {0};
     uint8_t command = data[0];
     switch( command ) {
         case EXIT:
             is_hid_connected = false;
             break;
+        case WRITE:
+            oled_set_cursor(0, data[1]);
+            oled_write(oled_data + 2, false);
+            break;
         case LAYER:
             activate_layer(data[1]);
             break;
-    default:
-        break;
+        case BRIGHTNESS:
+            oled_set_brightness(data[1]);
+            break;
+        case QUERY:
+            switch( data[1] ) {
+                case 1:
+                    if ( is_oled_on() ) {
+                        send_data[0] = 1;
+                    } else {
+                        send_data[0] = 0;
+                    }
+                    raw_hid_send(send_data, length);
+                    break;
+                case 2:
+                    oled_on();
+                    break;
+                case 3:
+                    oled_off();
+                    break;
+                case 4:
+                    // current layer
+                    send_data[0] = get_highest_layer(layer_state);
+                    raw_hid_send(send_data, length);
+                case 5:
+                    // current brightness
+                    send_data[0] = oled_get_brightness();
+                    raw_hid_send(send_data, length);
+                    break;
+                case 6:
+                    send_data[0] = oled_max_chars();
+                    raw_hid_send(send_data, length);
+                    break;
+                case 7:
+                    send_data[0] = oled_max_lines();
+                    raw_hid_send(send_data, length);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case CLEAR:
+            switch( data[1] ) {
+                case 8:
+                    oled_clear();
+                    break;
+                default:
+                    oled_set_cursor(0, data[1]);
+                    oled_advance_page(true);
+                    break;
+            }
+            break;
+        default:
+            break;
     }
     raw_hid_send(data, length);
 }   
