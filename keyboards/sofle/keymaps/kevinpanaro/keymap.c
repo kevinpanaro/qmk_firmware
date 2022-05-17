@@ -223,11 +223,17 @@ static void print_status_narrow(void) {
     
     oled_set_cursor(0, 2);
     if ( is_hid_connected ) {
-            oled_write_char(0x04, false);
-            // oled_write_P(PSTR("\n\n\n"), false);
-        } else {
-            oled_write_P(PSTR(" "), false);
-        }
+        oled_write_char(0x04, false);
+        // oled_write_P(PSTR("\n\n\n"), false);
+    } else {
+        oled_write_P(PSTR(" "), false);
+    }
+    oled_set_cursor(2, 2);
+    if (host_keyboard_led_state().caps_lock) {
+        oled_write_char(0x18, false);
+    } else {
+        oled_write_P(PSTR(" "), false);
+    }
 
     oled_set_cursor(0, 4);
     switch (get_highest_layer(default_layer_state)) {
