@@ -3,11 +3,6 @@
 *.swp
 *~
 .DS_Store
-._*
-
-# Merge files
-*.orig
-*.rej
 
 # Build artifacts
 .clang_complete
@@ -23,6 +18,7 @@
 
 # QMK-specific
 api_data/v1
+doxygen/
 quantum/version.h
 *.bin
 *.eep
@@ -31,11 +27,16 @@ quantum/version.h
 *.uf2
 
 # Old-style QMK Makefiles
-/keyboards/**/Makefile
-
-# kbfirmware....
-/keyboards/**/kb.h
-/keyboards/**/kb.c
+/keyboards/*/Makefile
+/keyboards/*/*/Makefile
+/keyboards/*/*/*/Makefile
+/keyboards/*/*/*/*/Makefile
+/keyboards/*/*/*/*/*/Makefile
+/keyboards/*/keymaps/Makefile
+/keyboards/*/*/keymaps/Makefile
+/keyboards/*/*/*/keymaps/Makefile
+/keyboards/*/*/*/*/keymaps/Makefile
+/keyboards/*/*/*/*/*/keymaps/Makefile
 
 # Eclipse/PyCharm/Other IDE Settings
 *.iml
@@ -66,12 +67,10 @@ CMakeLists.txt
 .vscode/temp.sql
 tags
 
-# Ignore image/font files
+# Ignore image files
 *.gif
 *.jpg
 *.png
-*.ttf
-*.otf
 
 # Things Travis sees
 /.vs
@@ -93,5 +92,15 @@ compile_commands.json
 .clangd/
 .cache/
 
-# VIA(L) json files that don't belong in QMK repo
-via*.json
+# ignore everything but my keyboard and other things i don't want tracked.
+keyboards/*
+!keyboards/macropad
+!keyboards/sofle
+!keyboards/1upkeyboards/1up60hse
+config.ini
+creds.json
+spot.py
+__avr_gdbinit
+notes.txt
+
+.gitignore
