@@ -96,7 +96,7 @@ compile_commands.json
 keyboards/*
 !keyboards/macropad
 !keyboards/sofle
-!keyboards/1upkeyboards/1up60hse
+!keyboards/1upkeyboards
 config.ini
 creds.json
 spot.py
