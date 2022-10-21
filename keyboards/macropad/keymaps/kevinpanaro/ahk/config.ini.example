@@ -1,0 +1,10 @@
+[AUTH]
+client_id=
+client_secret=
+redirect_uri=http://localhost:8080/
+scope=user-read-playback-state user-modify-playback-state
+username=youre_spotify_username
+
+[CONFIG]
+device=NAME_OF_YOUR_DEVICE
+volume_delta=5
