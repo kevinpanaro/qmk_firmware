@@ -24,7 +24,7 @@ for more options.
 
 #ifdef RGB_MATRIX_ENABLE
 
-#define RGBLED_NUM 71    // when soldering i destroyed the pad of the right side indicator. which is why this is 71. changes also made in rev 1
+#define RGBLED_NUM 72    // when soldering i destroyed the pad of the right side indicator. which is why this is 71. changes also made in rev 1
 #define DRIVER_LED_TOTAL RGBLED_NUM
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150 // limits maximum brightness of LEDs to 150 out of 255. Higher may cause the controller to crash.
 #define RGB_MATRIX_HUE_STEP 8
@@ -38,6 +38,8 @@ for more options.
 #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 #define ENABLE_RGB_MATRIX_GRADIENT_UP_DOWN
 #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+#define ENABLE_RGB_MATRIX_SOLID_REACTIVE
+#define ENABLE_RGB_MATRIX_SPLASH
 #define ENABLE_RGB_MATRIX_CYCLE_OUT_IN
 #endif
 
