@@ -234,12 +234,14 @@ static void render_logo(void) {
     oled_write_raw_P(raw_logo, sizeof(raw_logo));
 }
 
+#ifdef RGB_MATRIX_ENABLE        
 void render_rgb_status(void) {
     oled_write_ln("RGB:", false);
     static char temp[20] = {0};
     snprintf(temp, sizeof(temp) + 1, "M:%3dH:%3dS:%3dV:%3d", rgb_matrix_config.mode, rgb_matrix_config.hsv.h, rgb_matrix_config.hsv.s, rgb_matrix_config.hsv.v);
     oled_write(temp, false);
 }
+#endif
 
 static void print_status_narrow(void) {
     // Print current mode
@@ -445,6 +447,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     bool    is_shift = (temp_mod | temp_osm) & MOD_MASK_SHIFT;
 
     if (is_shift) {
+
+        #ifdef RGB_MATRIX_ENABLE
+
         if (index == 0) { /* First encoder */
             if (clockwise) {
                 rgb_matrix_increase_hue();
@@ -458,7 +463,13 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 rgb_matrix_increase_sat();
             }
         }
+
+        #endif
+
     } else if (is_ctrl) {
+
+        #ifdef RGB_MATRIX_ENABLE
+
         if (index == 0) { /* First encoder */
             if (clockwise) {
                 rgb_matrix_increase_val();
@@ -472,6 +483,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                 rgb_matrix_decrease_speed();
             }
         }
+
+        #endif
+
     } else {
         if (index == 1) { /* First encoder */
             if (clockwise) {
@@ -484,9 +498,9 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
         } else if (index == 0) { /* Second encoder */
             uint16_t mapped_code        = 0;
             if (clockwise) {
-                mapped_code = KC_VOLD;
-            } else {
                 mapped_code = KC_VOLU;
+            } else {
+                mapped_code = KC_VOLD;
             }
             tap_code_delay(mapped_code, MEDIA_KEY_DELAY);
         }
@@ -512,6 +526,7 @@ enum raw_hid_commands {
 enum hid_requests {
     SET_REQ=1,
     GET_REQ=2,
+    REPORT_REQ=3,
 };
 
 enum action_requests {
@@ -528,22 +543,62 @@ void set_action(uint8_t action, uint8_t arg) {
         case RGB_ACTION:
             break;
         case LAYER_ACTION:
+            activate_layer(arg);
             break;
         case EXIT_ACTION:
             is_hid_connected = false;
             break;
     }
 }
-void get_action(uint8_t action, uint8_t arg) {
+
+void set_action(uint8_t action, uint8_t arg, uint8_t value) {
     switch ( action ) {
         case OLED_ACTION:
             break;
         case RGB_ACTION:
             break;
         case LAYER_ACTION:
+            activate_layer(arg);
+            break;()
+        case EXIT_ACTION:
+            is_hid_connected = false;
+            break;
+    }
+}
+void get_action(uint8_t action, uint8_t arg) {
+    uint8_t send_data[RAW_EPSIZE] = {0};
+    switch ( action ) {
+        case OLED_ACTION:
+            break;
+        case RGB_ACTION:
+            break;
+        case LAYER_ACTION:
+            send_data[0] = get_highest_layer(default_layer_state);
+            raw_hid_send(send_data, sizeof(send_data));
             break;
         case EXIT_ACTION:
             is_hid_connected = false;
+            break;
+    }
+}
+void report_action(uint8_t action, uint8_t arg) {
+    uint8_t send_data[RAW_EPSIZE] = {0};
+    switch ( action ) {
+        case OLED_ACTION:
+            if ( is_oled_on() ) {
+                send_data[0] = 1;
+            } else {
+                send_data[0] = 0;
+            }
+            raw_hid_send(send_data, sizeof(send_data));
+            break;
+        case RGB_ACTION:
+            break;
+        case LAYER_ACTION:
+            break;
+        case EXIT_ACTION:
+            break;
+        default:
             break;
     }
 }
@@ -552,7 +607,6 @@ void get_action(uint8_t action, uint8_t arg) {
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     is_hid_connected = true;
     // const char *oled_data = (char*)data;
-    // uint8_t send_data[RAW_EPSIZE] = {0};
     uint8_t request = data[0]; // set or get
     uint8_t action = data[1];  // oled, rgb, layer,
     uint8_t arg = data[2];     // a value
@@ -563,6 +617,9 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             break;
         case GET_REQ:
             get_action(action, arg);
+            break;
+        case REPORT_REQ:
+            report_action(action, arg);
             break;
         default:
             break;
@@ -632,7 +689,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     //     default:
     //         break;
     // }
-    raw_hid_send(data, length);
+    // raw_hid_send(data, length);
 }
 
 #endif
