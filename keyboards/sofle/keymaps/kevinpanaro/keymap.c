@@ -20,8 +20,13 @@
     #include "raw_hid.h"
     #include <string.h>
     #define RAW_EPSIZE 32
-    uint8_t pixel_index = 0;
-    bool pixel_state = true;
+    
+    bool is_hid_connected = false; // is pc connected yet?
+    uint8_t send_data[RAW_EPSIZE] = {0};  // buffer for raw_hid_send
+    uint8_t request;  // SET, GET
+    uint8_t action;  // OLED, RGB, LAYER
+    uint8_t sub_action;  // sub section or layer
+    uint8_t value;  // brightness value or line number
 #endif
 
 enum sofle_layers {
@@ -46,18 +51,7 @@ enum custom_keycodes {
     KC_DLINE
 };
 
-enum raw_hid_commands {
-    WRITE=1,
-    PIXEL=2,
-    SCROLL=3,
-    BRIGHTNESS=4,
-    QUERY=5,
-    LAYER=6,
-    EXIT=7,
-    CLEAR=8,
-};
 
-bool is_hid_connected = false; // is pc connected yet?
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -218,10 +212,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 };
 
-void activate_layer(uint8_t layer) {
-    set_single_persistent_default_layer(layer);
-    // raw_hid_send_current_layer();
-}
 
 #ifdef OLED_ENABLE
 static void render_logo(void) {
@@ -468,23 +458,23 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 
     } else if (is_ctrl) {
 
-        #ifdef RGB_MATRIX_ENABLE
+        // #ifdef RGB_MATRIX_ENABLE
 
         if (index == 0) { /* First encoder */
             if (clockwise) {
-                rgb_matrix_increase_val();
+                oled_set_brightness(oled_get_brightness() + 0x10);
             } else {
-                rgb_matrix_decrease_val();
-            }
-        } else if (index == 1) { /* Second encoder */
-            if (clockwise) {
-                rgb_matrix_increase_speed();
-            } else {
-                rgb_matrix_decrease_speed();
-            }
-        }
+                oled_set_brightness(oled_get_brightness() - 0x10);
+            }}
+        // } else if (index == 1) { /* Second encoder */
+        //     if (clockwise) {
+        //         rgb_matrix_increase_speed();
+        //     } else {
+        //         rgb_matrix_decrease_speed();
+        //     }
+        // }
 
-        #endif
+        // #endif
 
     } else {
         if (index == 1) { /* First encoder */
@@ -536,160 +526,162 @@ enum action_requests {
     EXIT_ACTION=4,
 };
 
-void set_action(uint8_t action, uint8_t arg) {
-    switch ( action ) {
-        case OLED_ACTION:
-            break;
-        case RGB_ACTION:
-            break;
-        case LAYER_ACTION:
-            activate_layer(arg);
-            break;
-        case EXIT_ACTION:
-            is_hid_connected = false;
-            break;
-    }
+enum oled_args {
+    BRIGHTNESS=1,
+    STATE=2,
+    LINES=3,
+    CHARS=4,
+    WRITE=5,
+    READ=6,
+};
+
+void activate_layer(uint8_t layer) {
+    set_single_persistent_default_layer(layer);
 }
 
-void set_action(uint8_t action, uint8_t arg, uint8_t value) {
-    switch ( action ) {
-        case OLED_ACTION:
-            break;
-        case RGB_ACTION:
-            break;
-        case LAYER_ACTION:
-            activate_layer(arg);
-            break;()
-        case EXIT_ACTION:
-            is_hid_connected = false;
-            break;
-    }
+void clear_send_buffer(void) {
+    memset(send_data, 0, sizeof(send_data));
 }
-void get_action(uint8_t action, uint8_t arg) {
-    uint8_t send_data[RAW_EPSIZE] = {0};
-    switch ( action ) {
-        case OLED_ACTION:
+
+// void oled_set_action(uint8_t arg, uint8_t value) {
+//     switch ( arg ) {
+//         case BRIGHTNESS:
+//             oled_set_brightness(value);
+//             break;
+//         case STATE:
+//             if ( value == 0 ) {
+//                 oled_off();
+//             } else {
+//                 oled_on();
+//             }
+//             break;
+//         case WRITE:
+//             break;
+//         default:
+//             break;
+//     }
+// }
+
+void oled_get_action(uint8_t *data) {
+    sub_action = data[2];
+    switch ( sub_action ) {
+        case BRIGHTNESS:
+            send_data[0] = oled_get_brightness();
             break;
-        case RGB_ACTION:
-            break;
-        case LAYER_ACTION:
-            send_data[0] = get_highest_layer(default_layer_state);
-            raw_hid_send(send_data, sizeof(send_data));
-            break;
-        case EXIT_ACTION:
-            is_hid_connected = false;
-            break;
-    }
-}
-void report_action(uint8_t action, uint8_t arg) {
-    uint8_t send_data[RAW_EPSIZE] = {0};
-    switch ( action ) {
-        case OLED_ACTION:
+        case STATE:
             if ( is_oled_on() ) {
                 send_data[0] = 1;
             } else {
                 send_data[0] = 0;
             }
-            raw_hid_send(send_data, sizeof(send_data));
+            break;
+        case LINES:
+            send_data[0] = oled_max_lines();
+            break;
+        case CHARS:
+            send_data[0] = oled_max_chars();
+            break;
+        default:
+            memset(send_data, 255, sizeof(send_data));
+            break;
+    }
+    raw_hid_send(send_data, sizeof(send_data));
+}
+
+// void set_action(uint8_t action, uint8_t arg, uint8_t value) {
+//     switch ( action ) {
+//         case OLED_ACTION:
+//             oled_set_action(arg, value);
+//             break;
+//         case RGB_ACTION:
+//             break;
+//         case LAYER_ACTION:
+//             activate_layer(arg);
+//             break;
+//         case EXIT_ACTION:
+//             is_hid_connected = false;
+//             break;
+//     }
+// }
+
+void get_action(uint8_t *data) {
+    clear_send_buffer();
+    action = data[1];
+
+    switch ( action ) {
+        case OLED_ACTION:
+            oled_get_action(data);
             break;
         case RGB_ACTION:
             break;
         case LAYER_ACTION:
+            send_data[0] = get_highest_layer(default_layer_state) ;
+            raw_hid_send(send_data, sizeof(send_data));
             break;
         case EXIT_ACTION:
+            is_hid_connected = false;
             break;
         default:
             break;
     }
 }
 
+void oled_set_action(uint8_t *data) {
+    sub_action = data[2];
+    value = data[3];
+    uint8_t string[5];  // buffer to write to oled
+    switch ( sub_action ) {
+        case BRIGHTNESS:
+            oled_set_brightness(value);
+            break;
+        case STATE:
+            if ( value ) {
+                oled_on();
+            } else {
+                oled_off();
+            }
+            break;
+        case WRITE:
+            memcpy(string, &data[4], sizeof(string));
+            oled_set_cursor(0, value);
+            oled_write((char*)string, false);
+            break;
+        default:
+            break;
+    }
+}
+
+void set_action(uint8_t *data) {
+    action = data[1];
+    sub_action = data[2];
+    switch ( action ) {
+        case OLED_ACTION:
+            oled_set_action(data);
+            break;
+        case RGB_ACTION:
+            break;
+        case LAYER_ACTION:
+            activate_layer(sub_action);
+            break;
+        case EXIT_ACTION:
+            is_hid_connected = false;
+            break;
+    }
+}
 
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     is_hid_connected = true;
-    // const char *oled_data = (char*)data;
-    uint8_t request = data[0]; // set or get
-    uint8_t action = data[1];  // oled, rgb, layer,
-    uint8_t arg = data[2];     // a value
+    request = data[0]; // set or get
 
     switch( request ) {
         case SET_REQ:
-            set_action(action, arg);
+            set_action(data);
             break;
         case GET_REQ:
-            get_action(action, arg);
-            break;
-        case REPORT_REQ:
-            report_action(action, arg);
+            get_action(data);
             break;
         default:
             break;
     }
-    // switch( command ) {
-    //     case EXIT:
-    //         is_hid_connected = false;
-    //         break;
-    //     case WRITE:
-    //         oled_set_cursor(0, data[1]);
-    //         oled_write(oled_data + 2, false);
-    //         break;
-    //     case LAYER:
-    //         activate_layer(data[1]);
-    //         break;
-    //     case BRIGHTNESS:
-    //         oled_set_brightness(data[1]);
-    //         break;
-    //     case QUERY:
-    //         switch( data[1] ) {
-    //             case 1:
-    //                 if ( is_oled_on() ) {
-    //                     send_data[0] = 1;
-    //                 } else {
-    //                     send_data[0] = 0;
-    //                 }
-    //                 raw_hid_send(send_data, length);
-    //                 break;
-    //             case 2:
-    //                 oled_on();
-    //                 break;
-    //             case 3:
-    //                 oled_off();
-    //                 break;
-    //             case 4:
-    //                 // current layer
-    //                 send_data[0] = get_highest_layer(layer_state);
-    //                 raw_hid_send(send_data, length);
-    //             case 5:
-    //                 // current brightness
-    //                 send_data[0] = oled_get_brightness();
-    //                 raw_hid_send(send_data, length);
-    //                 break;
-    //             case 6:
-    //                 send_data[0] = oled_max_chars();
-    //                 raw_hid_send(send_data, length);
-    //                 break;
-    //             case 7:
-    //                 send_data[0] = oled_max_lines();
-    //                 raw_hid_send(send_data, length);
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //         break;
-    //     case CLEAR:
-    //         switch( data[1] ) {
-    //             case 8:
-    //                 oled_clear();
-    //                 break;
-    //             default:
-    //                 oled_set_cursor(0, data[1]);
-    //                 oled_advance_page(true);
-    //                 break;
-    //         }
-    //         break;
-    //     default:
-    //         break;
-    // }
-    // raw_hid_send(data, length);
 }
-
 #endif

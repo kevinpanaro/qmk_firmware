@@ -74,3 +74,13 @@ for more options.
 
 // this limits the number of layers the keyboard can use to 8. save some space.
 #define LAYER_STATE_8BIT
+
+// oled definitions
+#define SPLIT_OLED_ENABLE
+//#define SPLIT_LAYER_STATE_ENABLE
+// #define SPLIT_TRANSPORT_MIRROR
+// #define SPLIT_LED_STATE_ENABLE
+// #define SPLIT_MODS_ENABLE
+#define OLED_BRIGHTNESS 128
+#define OLED_FADE_OUT
+#define OLED_TIMEOUT 10000
