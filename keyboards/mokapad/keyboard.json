@@ -17,8 +17,7 @@
         "mousekey": true,
         "nkro": true,
         "encoder": true,
-        "oled": true,
-        "combo": false
+        "oled": true
     },
     "build": {
         "lto": true
